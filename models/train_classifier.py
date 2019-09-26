@@ -1,25 +1,75 @@
 import sys
-
+import pandas as pd
+import numpy as np
+from sqlalchemy import create_engine
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+nltk.download(['punkt','stopwords', 'wordnet', 'averaged_perceptron_tagger'])
+from sklearn.metrics import f1_score, accuracy_score, recall_score, precision_score, classification_report
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.ensemble import RandomForestClassifier
+import pickle
 
 def load_data(database_filepath):
-    pass
+    engine = create_engine('sqlite:///' + database_filepath)
+    df = pd.read_sql_table('df', engine)
+    df['related'] = df['related'].apply(lambda x: 0 if x == 0 else 1)
+    X = df['message'].values
+    Y = df.drop(df.columns[:4], axis =1).values
+    category_names = df.drop(df.columns[:4], axis =1).columns
+    return X, Y, category_names
 
 
 def tokenize(text):
-    pass
+    stop_words = stopwords.words("english")
+    lemmatizer = WordNetLemmatizer()
+    
+    # normalize case and remove punctuation
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+    
+    # tokenize text
+    tokens = word_tokenize(text)
+    
+    # lemmatize andremove stop words
+    tokens = [lemmatizer.lemmatize(word).strip() for word in tokens if word not in stop_words]
+
+    return tokens
 
 
 def build_model():
-    pass
+    pipeline = Pipeline([
+        ('text_pipeline', Pipeline([
+            ('vect', CountVectorizer(tokenizer=tokenize)),
+            ('tfidf', TfidfTransformer())
+        ])),
+
+        ('clf', MultiOutputClassifier(estimator = MultinomialNB()))
+    ])
+
+    parameters = {'text_pipeline__vect__ngram_range': [(1, 1), (1, 2)],
+                  'text_pipeline__tfidf__use_idf': (True, False),
+                  'clf__estimator__alpha': [1, 1e-1, 1e-2]}
+
+    cv = GridSearchCV(pipeline, param_grid=parameters, scoring='f1_micro')
+
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
-
-
+    Y_pred = model.predict(X_test)
+    for i in range(len(category_names)):
+         print("Classification Report for {}:".format(category_names[i]), classification_report(Y_test[:, i], Y_pred[:, i]))
+        
 def save_model(model, model_filepath):
-    pass
-
+    pickle.dump(model, open(model_filepath, 'wb'))
 
 def main():
     if len(sys.argv) == 3:
