@@ -7,15 +7,13 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-nltk.download(['punkt','stopwords', 'wordnet', 'averaged_perceptron_tagger'])
-from sklearn.metrics import f1_score, accuracy_score, recall_score, precision_score, classification_report
+nltk.download(['punkt','stopwords', 'wordnet'])
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.ensemble import RandomForestClassifier
 import pickle
 
 def load_data(database_filepath):
