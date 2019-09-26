@@ -66,7 +66,7 @@ def build_model():
 def evaluate_model(model, X_test, Y_test, category_names):
     Y_pred = model.predict(X_test)
     for i in range(len(category_names)):
-         print("Classification Report for {}:".format(category_names[i]), classification_report(Y_test[:, i], Y_pred[:, i]))
+         print("Classification Report for {}:".format(category_names[i]), '\n', classification_report(Y_test[:, i], Y_pred[:, i]))
         
 def save_model(model, model_filepath):
     pickle.dump(model, open(model_filepath, 'wb'))
