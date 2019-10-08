@@ -19,11 +19,6 @@
 
     `env|grep WORK`
 
-   The output that looks something like this:
-   ![image](image.png)
-
    In a new web browser window, type in the following:
 
    `https://SPACEID-3001.SPACEDOMAIN`
-
-  
