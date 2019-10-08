@@ -15,4 +15,15 @@
 
     `python run.py`
 
-3. Go to http://0.0.0.0:3001/
+3. Open another Terminal Window and type:
+
+    `env|grep WORK`
+
+   The output that looks something like this:
+   ![image](image.png)
+
+   In a new web browser window, type in the following:
+
+   `https://SPACEID-3001.SPACEDOMAIN`
+
+  
